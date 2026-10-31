@@ -5,4 +5,4 @@ This is a self-contained index.html file of 10KB, specially made for the
 
 No resources or external scripts are loaded in the index page.
 
-[Play it here](https://eefano.github.io/elgatenkb/)
+[Play it here](https://eefano.itch.io/el-gato-10-kb)
