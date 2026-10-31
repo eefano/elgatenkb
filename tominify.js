@@ -156,8 +156,8 @@ function Entity(o = {}) {
     o.vis = true
     o.drawfunc = () => {
         drawSubTexture(rects[poses[o.pawse * 3 + 2]],
-        o.posx + poses[o.pawse * 3] - bx,
-        o.posy + poses[o.pawse * 3 + 1] - by, zoom
+        o.posx + (poses[o.pawse * 3] - bx) * zoom,
+        o.posy + (poses[o.pawse * 3 + 1] - by) *zoom, zoom
       )
     }
     o.pawse = pawse
@@ -516,21 +516,21 @@ function step() {
   function spawnclocks(howMany, shootChance, steerChance) {
     for (let i = 0; i < howMany - VL.mob.size; i++) {
       Clock(shootChance, steerChance, () => {
-        points += 10
+        points++
       })
     }
   }
 
   if (!win) {
-    if (points >= 500) {
+    if (points >= 50) {
       win = true
       VL.bkg.forEach((o) => o.hasMovement(() => { }))
       VL.mob.forEach((o) => o.remover())
       VL.enf.forEach((o) => o.remover())
-      Text(120, 110, () => "WINNER!", WHITE)
+      Text(140, 110, () => "WINNER!", WHITE)
       Entity()
         .hasPos(160, walkline)
-        .hasSprite(VL.mob, 18)
+        .hasSprite(VL.mob, 18, 2)
 
       //play("win.mp3", true)
       for (let i = 0, k = 0; i < 16; i++, k += .2) {
@@ -539,12 +539,12 @@ function step() {
         svatlin(vgain[2], .3, 0, k * 2, k)
       }
 
-    } else if (points >= 400) spawnclocks(7, 10, 10)
-    else if (points >= 300) spawnclocks(6, 5, 5)
-    else if (points >= 200) spawnclocks(5, 5, 3.3)
-    else if (points >= 150) spawnclocks(4, 2.5, 2.5)
-    else if (points >= 100) spawnclocks(3, 2.5, 2)
-    else if (points >= 50) spawnclocks(2, 0, 1.6)
+    } else if (points >= 40) spawnclocks(7, 10, 10)
+    else if (points >= 30) spawnclocks(6, 5, 5)
+    else if (points >= 20) spawnclocks(5, 5, 3.3)
+    else if (points >= 15) spawnclocks(4, 2.5, 2.5)
+    else if (points >= 10) spawnclocks(3, 2.5, 2)
+    else if (points >= 5) spawnclocks(2, 0, 1.6)
     else spawnclocks(1, 0, 0)
   }
 
@@ -568,11 +568,11 @@ function init() {
   Background(0)
   Background(xres)
   Text(1, 6, () => "CURSORS+SPACE.CROUCH 4 HI-JUMPS", [0, 1, 1])
-  Text(10, yres - 5, () => "# " + cat.lives, [1, .5, .5])
-  Text(240, yres - 5, () => "$ " + points, [1, 1, 0])
+  Text(10, yres - 3, () => "# " + cat.lives, [1, .5, .5])
+  Text(275, yres - 3, () => "$ " + points, [1, 1, 0])
 
   cat = Cat(40, walkline, () => {
-    Text(120, 110, () => "GAME OVER", WHITE)
+    Text(136, 110, () => "GAME OVER", WHITE)
     //play("die.mp3", true)
     svatlin(vpitch[2], 500, 250, 1)
     svatlin(vfilter[2], 2000, 200, 1)
@@ -582,9 +582,11 @@ function init() {
 }
 
 function keydown(e) {
-  if (!keystate[e.keyCode]) {
-    keystate[e.keyCode] = true
-    keytrigs[e.keyCode] = true
+  if (audioCtx.state === 'suspended') audioCtx.resume()
+  let k = e.keyCode
+  if (!keystate[k]) {
+    keystate[k] = true
+    keytrigs[k] = true
   }
 }
 function keyup(e) {
