@@ -281,7 +281,7 @@ function Cat(xp, yp, diefunc) {
       }
     })
     .hasMovement((frame) => {
-      if (keytrigs[32] && !o.dead) {
+      if (keytrigs[13] && !o.dead) {
         let dx = 0
         if (keystate[37]) dx = dx - 1
         if (keystate[39]) dx = dx + 1
@@ -545,7 +545,7 @@ function init() {
   //play("ingame.mp3", true)
   Background(0)
   Background(xres)
-  Text(1, 6, () => "CURSORS+SPACE.CROUCH 4 HI-JUMPS", [0, 1, 1])
+  Text(1, 6, () => "CURSORS+ENTER.CROUCH 4 HI-JUMPS", [0, 1, 1])
   Text(10, yres - 3, () => "# " + cat.lives, [1, .5, .5])
   Text(275, yres - 3, () => "$ " + points, [1, 1, 0])
 
