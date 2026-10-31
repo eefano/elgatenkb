@@ -2,11 +2,12 @@ let weendow = window, BASEX = 50, BASEY = 75
 
 let WHITE = [1, 1, 1]
 let OUTLINE = [.1, .1, .1]
+let N2000=2000
 
 let gl, uniforms = {}
 
 let xres, yres, canvas, canvasstyle, keystate = [], keytrigs = []
-let frame = 0, points = 0, win = false, cat, walkline = 220
+let frame = 0, points = 0, win = false, dead = false, cat, walkline = 220
 
 let audioCtx = new weendow.AudioContext();
 let vpitch = []
@@ -237,7 +238,7 @@ function svatlin(what, v0, v1, t, t0 = 0) {
 function Lazur(posx, posy, dx, dy) {
 
   // play('shot.mp3')
-  svatlin(vpitch[0], 2000, 0, .1)
+  svatlin(vpitch[0], N2000, 0, .1)
   svatlin(vgain[0], .2, 0, .1)
 
   let pawse = 6 + (dx + 1) + (dy + 1) * 3
@@ -263,14 +264,13 @@ function Cat(xp, yp, diefunc) {
     lives: 9,
     jumping: false,
     crouching: false,
-    dead: false,
     jumpstart: 0,
     diefunc: diefunc,
   })
     .hasPos(xp, yp)
     .hasSprite(VL.cat, 2)
     .hasAnimation((frame) => {
-      if (o.dead) o.pawse = 5
+      if (dead) o.pawse = 5
       else {
         if (o.jumping) o.pawse = 1
         else if (o.crouching) o.pawse = 4
@@ -281,7 +281,7 @@ function Cat(xp, yp, diefunc) {
       }
     })
     .hasMovement((frame) => {
-      if (keytrigs[13] && !o.dead) {
+      if (keytrigs[13] && !dead) {
         let dx = 0
         if (keystate[37]) dx = dx - 1
         if (keystate[39]) dx = dx + 1
@@ -296,7 +296,7 @@ function Cat(xp, yp, diefunc) {
         o.deferrer(() => Lazur(px, py, dx, dy))
       }
 
-      if (keytrigs[38] && !o.jumping && !o.dead) {
+      if (keytrigs[38] && !o.jumping && !dead) {
         o.jumping = true
         o.jumpcycle = o.crouching ? jumpbig : jumpsmall
         o.crouching = false
@@ -309,39 +309,39 @@ function Cat(xp, yp, diefunc) {
         else o.jumping = false
       } else {
         o.posy = yp
-        if (o.dead) o.crouching = true
+        if (dead) o.crouching = true
         else o.crouching = keystate[40]
       }
 
-      if (!o.crouching && !o.dead) {
+      if (!o.crouching && !dead) {
         if (keystate[37]) o.posx -= 2
         if (keystate[39]) o.posx += 2
       } else if (!win) o.posx -= 1
 
-      if (o.posx < 20 && !o.dead) {
+      if (o.posx < 20 && !dead) {
         o.crouching = false
         o.posx = 20
       }
-      if (o.posx < -100 && o.dead) {
+      if (o.posx < -100 && dead) {
         o.remover()
       }
 
       if (o.posx > 300) o.posx = 300
     })
     .hasCollision(CL.cat, () => {
-      if (!o.invulnerable && !o.dead) {
+      if (!o.invulnerable && !dead && !win) {
         o.cancollide = false
 
         o.lives = o.lives - 1
         if (o.lives == 0) {
-          o.dead = true
+          dead = true
           o.pawse = 5
           o.diefunc(o)
         } else {
 
           //play('hit.mp3')
           svatlin(vpitch[2], 400 + rand(50), 300, .4)
-          svatlin(vfilter[2], 2000, 100, .3)
+          svatlin(vfilter[2], N2000, 100, .3)
           svatnow(vgain[2], .3)
           svatnow(vgain[2], 0, .5)
 
@@ -391,9 +391,8 @@ function rand(n) {
   return (Math.random() * n) | 0
 }
 
-function dice(p1000) {
-  if (p1000 == 0) return false
-  return rand(1000) <= p1000
+function dice(p) {
+  return (1-p/1000)<=Math.random()
 }
 
 function Background(xstart) {
@@ -428,8 +427,7 @@ function collisions(oo1, oo2) {
       if (!o2.cancollide) continue
       let m2 = meh(o2)
 
-      //if ((a2x - b1x) * (b2x - a1x) < 0.0 && (a2y - b1y) * (b2y - a1y) < 0.0) {
-      if ((m2[0] - m1[2]) * (m2[2] - m1[0]) < 0.0 && (m2[1] - m1[3]) * (m2[3] - m1[1]) < 0.0) {
+      if ((m2[0] - m1[2]) * (m2[2] - m1[0]) < 0 && (m2[1] - m1[3]) * (m2[3] - m1[1]) < 0) {
         o1.collision(o2)
         o2.collision(o1)
       }
@@ -494,13 +492,13 @@ function step() {
   function spawnclocks(howMany, shootChance, steerChance) {
     for (let i = 0; i < howMany - VL.mob.size; i++) {
       Clock(shootChance, steerChance, () => {
-        points++
+        if(!dead) points++
       })
     }
   }
 
   if (!win) {
-    if (points >= 50) {
+    if (points >= 100) {
       win = true
       VL.bkg.forEach((o) => o.hasMovement(() => { }))
       VL.mob.forEach((o) => o.remover())
@@ -513,16 +511,16 @@ function step() {
       //play("win.mp3", true)
       for (let i = 0, k = 0; i < 16; i++, k += .2) {
         svatnow(vpitch[2], (200 + (i >> 2) * 30) * ((i & 3) * .5 + 1), k)
-        svatlin(vfilter[2], 2000, 300, .5 * k, k)
+        svatlin(vfilter[2], N2000, 300, .5 * k, k)
         svatlin(vgain[2], .3, 0, k * 2, k)
       }
 
-    } else if (points >= 40) spawnclocks(7, 10, 10)
-    else if (points >= 30) spawnclocks(6, 5, 5)
-    else if (points >= 20) spawnclocks(5, 5, 3.3)
-    else if (points >= 15) spawnclocks(4, 2.5, 2.5)
-    else if (points >= 10) spawnclocks(3, 2.5, 2)
-    else if (points >= 5) spawnclocks(2, 0, 1.6)
+    } else if (points >= 90) spawnclocks(5, 4, 5)
+    else if (points >= 80) spawnclocks(4, 3, 4)
+    else if (points >= 70) spawnclocks(3, 2, 3)
+    else if (points >= 50) spawnclocks(3, 2, 2)
+    else if (points >= 30) spawnclocks(2, 1, 2)
+    else if (points >= 10) spawnclocks(2, 0, 1)
     else spawnclocks(1, 0, 0)
   }
 
@@ -545,7 +543,7 @@ function init() {
   //play("ingame.mp3", true)
   Background(0)
   Background(xres)
-  Text(1, 6, () => "CURSORS+ENTER.CROUCH 4 HI-JUMPS", [0, 1, 1])
+  Text(67, 6, () => "CURSORS+ENTER.CROUCH 4 HI-JUMPS", [0, 1, 1])
   Text(10, yres - 3, () => "# " + cat.lives, [1, .5, .5])
   Text(275, yres - 3, () => "$ " + points, [1, 1, 0])
 
@@ -553,7 +551,7 @@ function init() {
     Text(136, 110, () => "GAME OVER", WHITE)
     //play("die.mp3", true)
     svatlin(vpitch[2], 500, 250, 1)
-    svatlin(vfilter[2], 2000, 200, 1)
+    svatlin(vfilter[2], N2000, 200, 1)
     svatnow(vgain[2], .3)
     svatnow(vgain[2], 0, 1.5)
   })
