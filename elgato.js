@@ -545,7 +545,7 @@ function init() {
   //play("ingame.mp3", true)
   Background(0)
   Background(xres)
-  Text(1, 6, () => "CURSORS+SPACE.CROUCH JUMPS HIGHER", [0, 1, 1])
+  Text(1, 6, () => "CURSORS+SPACE.CROUCH 4 HI-JUMPS", [0, 1, 1])
   Text(10, yres - 5, () => "# " + cat.lives, [1, .5, .5])
   Text(240, yres - 5, () => "$ " + points, [1, 1, 0])
 
