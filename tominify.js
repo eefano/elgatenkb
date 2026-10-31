@@ -1,12 +1,12 @@
 let rects = [
-  [ 89, 0, 23, 37 ],   [ 0, 37, 29, 27 ],
-  [ 89, 38, 29, 27 ],  [ 30, 57, 34, 12 ],
-  [ 30, 41, 35, 15 ],  [ 127, 32, 6, 4 ],
-  [ 113, 32, 3, 5 ],   [ 134, 32, 6, 4 ],
-  [ 30, 37, 6, 1 ],    [ 113, 0, 25, 15 ],
-  [ 113, 16, 25, 15 ], [ 119, 32, 7, 9 ],
-  [ 0, 0, 47, 36 ],    [ 48, 0, 40, 40 ],
-  [ 139, 0, 1, 1 ],    [ 139, 2, 1, 1 ]
+  [ 89, 121, 23, 37 ],  [ 113, 121, 29, 27 ],
+  [ 113, 149, 29, 27 ], [ 36, 162, 34, 12 ],
+  [ 0, 158, 35, 15 ],   [ 151, 121, 6, 4 ],
+  [ 143, 131, 3, 5 ],   [ 151, 126, 6, 4 ],
+  [ 147, 131, 6, 1 ],   [ 71, 162, 25, 15 ],
+  [ 0, 174, 25, 15 ],   [ 143, 121, 7, 9 ],
+  [ 0, 121, 47, 36 ],   [ 48, 121, 40, 40 ],
+  [ 0, 0, 160, 120 ],   [ 158, 121, 1, 1 ]
 ]
 let poses = [
    0,  0,  0, 38, 37,  0, 35, 48,  1, 35, 48,  2,
@@ -14,17 +14,18 @@ let poses = [
   50, 72,  7, 47, 75,  8, 50, 75,  8, 50, 75,  8,
   47, 75,  7, 50, 75,  6, 50, 75,  5, 38, 66,  9,
   38, 66, 10, 47, 70, 11, 26, 39, 12,  0,  0, 13,
-  49, 42, 14, 58, 53, 14, 58, 53, 14, 62, 68, 14
+   0,  0, 14, 49, 42, 15, 58, 53, 15, 58, 53, 15,
+  62, 68, 15
 ]
-let images = [
-"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"]
+let imagew = 160
+let imageh = 189
+let imagedata = "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"
 let weendow = window, BASEX = 50, BASEY = 75
 
 let WHITE = [1, 1, 1]
 let OUTLINE = [.1, .1, .1]
 
-let gl, textures = [], uniforms = {}
+let gl, uniforms = {}
 
 let xres, yres, canvas, canvasstyle, keystate = [], keytrigs = []
 let frame = 0, points = 0, win = false, cat, walkline = 220
@@ -103,19 +104,20 @@ function initWebgl() {
   gl.vertexAttribPointer(aP, 2, 5126 /*gl.FLOAT*/, false, 0, 0)
 }
 
-function drawSubTexture(name, sx, sy, sw, sh, dx, dy, k = 1) {
-  let tex = textures[name]
-  glBindTexture(tex.id)
+function drawSubTexture(r, dx, dy, k = 1) {
   glUniform2f("uO", dx, dy)
-  gl.uniform4fv(uniforms["uC"], tex.col)
-  glUniform2f("uS", sw * k, sh * k)
-  glUniform2f("uW", sw / tex.size.x, sh / tex.size.y)
-  glUniform2f("uX", sx / tex.size.x, sy / tex.size.y)
+  glUniform2f("uS", r[2] * k, r[3] * k)
+  glUniform2f("uW", r[2] / imagew, r[3] / imageh)
+  glUniform2f("uX", r[0] / imagew, r[1] / imageh)
   gl.drawArrays(gl.TRIANGLES, 0, 6)
 }
 
 function glTexParameteri(par, val) {
   gl.texParameteri(3553 /*gl.TEXTURE_2D*/, par, val)
+}
+
+function tintTexture(col) {
+  gl.uniform4f(uniforms["uC"], col[0], col[1], col[2], 1)
 }
 
 function loadTexture(image) {
@@ -126,16 +128,7 @@ function loadTexture(image) {
   glTexParameteri(10240 /*gl.TEXTURE_MAG_FILTER*/, 9728 /*gl.NEAREST*/)
   glTexParameteri(10242 /*gl.TEXTURE_WRAP_S*/, 33071 /*gl.CLAMP_TO_EDGE*/)
   glTexParameteri(10243 /*gl.TEXTURE_WRAP_T*/, 33071 /*gl.CLAMP_TO_EDGE*/)
-
-  textures.push({
-    id: id,
-    size: { x: image.width, y: image.height },
-    col: new Float32Array([1, 1, 1, 1]),
-  })
-}
-
-function tintTexture(name, col) {
-  for (let c of [0, 1, 2]) textures[name].col[c] = col[c]
+  tintTexture(WHITE)
 }
 
 function Entity(o = {}) {
@@ -159,14 +152,12 @@ function Entity(o = {}) {
     return o.inSet(Cmp.speeders)
   }
 
-  o.hasSprite = (layer, pawse, tex = 0) => {
+  o.hasSprite = (layer, pawse, zoom = 1, bx = BASEX, by = BASEY) => {
     o.vis = true
     o.drawfunc = () => {
-      let r = rects[poses[o.pawse * 3 + 2]]
-      drawSubTexture(
-        tex, r[0], r[1], r[2], r[3],
-        o.posx + poses[o.pawse * 3] - BASEX,
-        o.posy + poses[o.pawse * 3 + 1] - BASEY
+        drawSubTexture(rects[poses[o.pawse * 3 + 2]],
+        o.posx + poses[o.pawse * 3] - bx,
+        o.posy + poses[o.pawse * 3 + 1] - by, zoom
       )
     }
     o.pawse = pawse
@@ -219,18 +210,18 @@ function normaltext(text, xo, yo) {
   let x = xo, y = yo - 5, r = rects[poses[19 * 3 + 2]]
   for (let i = 0; i < text.length; i++) {
     c = text.charCodeAt(i) - 32;
-    drawSubTexture(0, r[0] + (c & 7) * 5, r[1] + (c >> 3) * 5, 5, 5, x, y)
+    drawSubTexture([r[0] + (c & 7) * 5, r[1] + (c >> 3) * 5, 5, 5], x, y)
     x += 6
   }
 }
 
 function outlinetext(text, x, y, fore, back) {
-  tintTexture(0, back)
+  tintTexture(back)
   let offs = [[0, 0], [1, 0], [2, 0], [0, 1], [2, 1], [0, 2], [1, 2], [2, 2]]
   for (let i of offs) normaltext(text, x + i[0], y + i[1])
-  tintTexture(0, fore)
+  tintTexture(fore)
   normaltext(text, x + 1, y + 1)
-  tintTexture(0, WHITE)
+  tintTexture(WHITE)
 }
 
 function Bell(posx, posy, targetx, targety) {
@@ -320,7 +311,7 @@ function Cat(xp, yp, diefunc) {
         if (keystate[38]) dy = dy - 1
         if (keystate[40]) dy = dy + 1
 
-        let fire = (o.pawse + 19) * 3
+        let fire = (o.pawse + 20) * 3
         let px = o.posx + poses[fire] - BASEX
         let py = o.posy + poses[fire + 1] - BASEY
 
@@ -428,8 +419,9 @@ function dice(p1000) {
 }
 
 function Background(xstart) {
-  let o = Entity({ posx: xstart, vis: true, drawfunc: () => drawSubTexture(1, 0, 0, xres / 2, yres / 2, o.posx, 0, 2) })
-    .inSet(VL.bkg)
+  let o = Entity()
+    .hasPos(xstart, 0)
+    .hasSprite(VL.bkg, 20, 2, 0, 0)
     .hasMovement(() => {
       o.posx--
       if (o.posx <= -xres) o.posx = xres
@@ -636,12 +628,10 @@ listener("load", async () => {
   resize()
   initWebgl()
 
-  for (let b64 of images) {
-    let image = new Image()
-    image.src = 'data:image/png;base64,' + b64
-    await image.decode()
-    loadTexture(image)
-  }
+  let image = new Image()
+  image.src = 'data:image/png;base64,' + imagedata
+  await image.decode()
+  loadTexture(image)
 
   for (let v = 0; v < 4; v++) {
     let oscNode = audioCtx.createOscillator();

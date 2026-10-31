@@ -3,7 +3,7 @@ let weendow = window, BASEX = 50, BASEY = 75
 let WHITE = [1, 1, 1]
 let OUTLINE = [.1, .1, .1]
 
-let gl, textures = [], uniforms = {}
+let gl, uniforms = {}
 
 let xres, yres, canvas, canvasstyle, keystate = [], keytrigs = []
 let frame = 0, points = 0, win = false, cat, walkline = 220
@@ -82,19 +82,20 @@ function initWebgl() {
   gl.vertexAttribPointer(aP, 2, 5126 /*gl.FLOAT*/, false, 0, 0)
 }
 
-function drawSubTexture(name, sx, sy, sw, sh, dx, dy, k = 1) {
-  let tex = textures[name]
-  glBindTexture(tex.id)
+function drawSubTexture(r, dx, dy, k = 1) {
   glUniform2f("uO", dx, dy)
-  gl.uniform4fv(uniforms["uC"], tex.col)
-  glUniform2f("uS", sw * k, sh * k)
-  glUniform2f("uW", sw / tex.size.x, sh / tex.size.y)
-  glUniform2f("uX", sx / tex.size.x, sy / tex.size.y)
+  glUniform2f("uS", r[2] * k, r[3] * k)
+  glUniform2f("uW", r[2] / imagew, r[3] / imageh)
+  glUniform2f("uX", r[0] / imagew, r[1] / imageh)
   gl.drawArrays(gl.TRIANGLES, 0, 6)
 }
 
 function glTexParameteri(par, val) {
   gl.texParameteri(3553 /*gl.TEXTURE_2D*/, par, val)
+}
+
+function tintTexture(col) {
+  gl.uniform4f(uniforms["uC"], col[0], col[1], col[2], 1)
 }
 
 function loadTexture(image) {
@@ -105,16 +106,7 @@ function loadTexture(image) {
   glTexParameteri(10240 /*gl.TEXTURE_MAG_FILTER*/, 9728 /*gl.NEAREST*/)
   glTexParameteri(10242 /*gl.TEXTURE_WRAP_S*/, 33071 /*gl.CLAMP_TO_EDGE*/)
   glTexParameteri(10243 /*gl.TEXTURE_WRAP_T*/, 33071 /*gl.CLAMP_TO_EDGE*/)
-
-  textures.push({
-    id: id,
-    size: { x: image.width, y: image.height },
-    col: new Float32Array([1, 1, 1, 1]),
-  })
-}
-
-function tintTexture(name, col) {
-  for (let c of [0, 1, 2]) textures[name].col[c] = col[c]
+  tintTexture(WHITE)
 }
 
 function Entity(o = {}) {
@@ -138,14 +130,12 @@ function Entity(o = {}) {
     return o.inSet(Cmp.speeders)
   }
 
-  o.hasSprite = (layer, pawse, tex = 0) => {
+  o.hasSprite = (layer, pawse, zoom = 1, bx = BASEX, by = BASEY) => {
     o.vis = true
     o.drawfunc = () => {
-      let r = rects[poses[o.pawse * 3 + 2]]
-      drawSubTexture(
-        tex, r[0], r[1], r[2], r[3],
-        o.posx + poses[o.pawse * 3] - BASEX,
-        o.posy + poses[o.pawse * 3 + 1] - BASEY
+        drawSubTexture(rects[poses[o.pawse * 3 + 2]],
+        o.posx + poses[o.pawse * 3] - bx,
+        o.posy + poses[o.pawse * 3 + 1] - by, zoom
       )
     }
     o.pawse = pawse
@@ -198,18 +188,18 @@ function normaltext(text, xo, yo) {
   let x = xo, y = yo - 5, r = rects[poses[19 * 3 + 2]]
   for (let i = 0; i < text.length; i++) {
     c = text.charCodeAt(i) - 32;
-    drawSubTexture(0, r[0] + (c & 7) * 5, r[1] + (c >> 3) * 5, 5, 5, x, y)
+    drawSubTexture([r[0] + (c & 7) * 5, r[1] + (c >> 3) * 5, 5, 5], x, y)
     x += 6
   }
 }
 
 function outlinetext(text, x, y, fore, back) {
-  tintTexture(0, back)
+  tintTexture(back)
   let offs = [[0, 0], [1, 0], [2, 0], [0, 1], [2, 1], [0, 2], [1, 2], [2, 2]]
   for (let i of offs) normaltext(text, x + i[0], y + i[1])
-  tintTexture(0, fore)
+  tintTexture(fore)
   normaltext(text, x + 1, y + 1)
-  tintTexture(0, WHITE)
+  tintTexture(WHITE)
 }
 
 function Bell(posx, posy, targetx, targety) {
@@ -299,7 +289,7 @@ function Cat(xp, yp, diefunc) {
         if (keystate[38]) dy = dy - 1
         if (keystate[40]) dy = dy + 1
 
-        let fire = (o.pawse + 19) * 3
+        let fire = (o.pawse + 20) * 3
         let px = o.posx + poses[fire] - BASEX
         let py = o.posy + poses[fire + 1] - BASEY
 
@@ -407,8 +397,9 @@ function dice(p1000) {
 }
 
 function Background(xstart) {
-  let o = Entity({ posx: xstart, vis: true, drawfunc: () => drawSubTexture(1, 0, 0, xres / 2, yres / 2, o.posx, 0, 2) })
-    .inSet(VL.bkg)
+  let o = Entity()
+    .hasPos(xstart, 0)
+    .hasSprite(VL.bkg, 20, 2, 0, 0)
     .hasMovement(() => {
       o.posx--
       if (o.posx <= -xres) o.posx = xres
@@ -615,12 +606,10 @@ listener("load", async () => {
   resize()
   initWebgl()
 
-  for (let b64 of images) {
-    let image = new Image()
-    image.src = 'data:image/png;base64,' + b64
-    await image.decode()
-    loadTexture(image)
-  }
+  let image = new Image()
+  image.src = 'data:image/png;base64,' + imagedata
+  await image.decode()
+  loadTexture(image)
 
   for (let v = 0; v < 4; v++) {
     let oscNode = audioCtx.createOscillator();

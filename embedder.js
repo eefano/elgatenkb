@@ -27,14 +27,14 @@ for (const [key, value] of Object.entries(js.frames)) {
       rects.push([value.frame.x, value.frame.y, value.frame.w, value.frame.h])
     }
 
-    if(!dumbframe(value.spriteSourceSize)) poses.push(value.spriteSourceSize.x,value.spriteSourceSize.y,i)
+    //if (!dumbframe(value.spriteSourceSize))
+      poses.push(value.spriteSourceSize.x, value.spriteSourceSize.y, i)
 
   }
 }
 
 console.log('let rects =', rects)
 console.log('let poses =', poses)
-
-console.log('let images = [')
-console.log("\"" + fs.readFileSync("elgato_crushed.png").toString("base64") + "\",")
-console.log("\"" + fs.readFileSync("bg_crushed.png").toString("base64") + "\"]")
+console.log('let imagew =', js.meta.size.w)
+console.log('let imageh =', js.meta.size.h)
+console.log('let imagedata = "' + fs.readFileSync("elgato_crushed.png").toString("base64") + '"')
